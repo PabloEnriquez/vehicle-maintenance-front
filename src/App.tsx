@@ -1,24 +1,91 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect, useCallback } from 'react'
+import Spinner from './components/Spinner/Spinner'
+import Modal from './components/Modal/Modal'
+import AttendantForm from './components/AttendantForm/AttendantForm'
+import Vehicle from './components/Vehicle/Vehicle'
+import VehicleType from './interfaces/vehicle.type'
+import { getVehicles } from './services/vehicle.service'
+import './App.css'
 
 const App: React.FC = () => {
+  const [vehicles, setVehicles] = useState<Array<VehicleType>>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [errorModalOpen, setErrorModalOpen] = useState(false)
+  // const [formModalOpen, setFormModalOpen] = useState(false)
+  const [error, setError] = useState('')
+  const [selected, setSelected] = useState<number | null>(null)
+
+  /**
+   * fetch data only
+   */
+  const fetchVehicles = useCallback(() => {
+    setIsLoading(true)
+    getVehicles()
+      .then(res => {
+        setVehicles(res)
+      })
+      .catch(error => {
+        setError(error.message)
+        setErrorModalOpen(true)
+      })
+      .finally(() => {
+        setIsLoading(false)
+      })
+  }, [])
+
+  useEffect(() => {
+    fetchVehicles()
+  }, [fetchVehicles])
+
+  /**
+   * Handle select vehicle actions
+   */
+  const handleSelectVehicle = useCallback((vehicleId?: number): void => {
+    if (!vehicleId) {
+      setError('You cannot make operations without an id')
+      setErrorModalOpen(true)
+      return
+    }
+    setSelected(vehicleId)
+    // setFormModalOpen(true)
+  }, [])
+
+  const handleCloseSetMaintenance = useCallback(() => {
+    setSelected(null)
+    fetchVehicles()
+  }, [fetchVehicles])
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
+      {
+        isLoading ? <Spinner /> : null
+      }
+      <h1>Vehicles</h1>
+      {
+        vehicles.map((vehicle, idx) =>
+        <Vehicle
+          key={vehicle.id || idx}
+          {...vehicle}
+          handleClick={handleSelectVehicle}
+        />
+        )
+      }
+      <Modal
+        show={errorModalOpen}
+        handleClose={() => setErrorModalOpen(false)}
         >
-          Learn React
-        </a>
-      </header>
+          <div className="errorMsg">
+            {error || 'Error retrieving vehicles'}
+          </div>
+      </Modal>
+      <Modal
+        show={!!selected}
+        handleClose={handleCloseSetMaintenance}
+      >
+        {
+          selected ? <AttendantForm vehicleId={selected} /> : null
+        }
+      </Modal>
     </div>
   );
 }
