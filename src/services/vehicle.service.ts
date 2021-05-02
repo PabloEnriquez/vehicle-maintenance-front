@@ -4,6 +4,10 @@ import Maintenance from '../interfaces/maintenance.type'
 
 const axiosInstance = axios.create({ baseURL: process.env.REACT_APP_API_URL })
 
+/**
+ * Service API to get vehicles list
+ * @returns {Promise<Array<Vehicle>>} list of vehicles
+ */
 export const getVehicles = async (): Promise<Array<Vehicle>> => {
   try {
     const { data } = await axiosInstance.get('/')
@@ -14,6 +18,12 @@ export const getVehicles = async (): Promise<Array<Vehicle>> => {
   }
 }
 
+/**
+ * Service API to update vehicle data to reflect maintenance was activated
+ * @param vehicleId Vehicle's id to update
+ * @param maintenanceData attendant and date data
+ * @returns 
+ */
 export const setMaintenance = async (vehicleId: number, maintenanceData: Maintenance): Promise<Vehicle> => {
   try {
     const { data } = await axiosInstance.patch(`/${vehicleId}`, maintenanceData)

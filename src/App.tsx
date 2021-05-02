@@ -11,12 +11,11 @@ const App: React.FC = () => {
   const [vehicles, setVehicles] = useState<Array<VehicleType>>([])
   const [isLoading, setIsLoading] = useState(false)
   const [errorModalOpen, setErrorModalOpen] = useState(false)
-  // const [formModalOpen, setFormModalOpen] = useState(false)
   const [error, setError] = useState('')
   const [selected, setSelected] = useState<number | null>(null)
 
   /**
-   * fetch data only
+   * fetch data process
    */
   const fetchVehicles = useCallback(() => {
     setIsLoading(true)
@@ -39,6 +38,9 @@ const App: React.FC = () => {
 
   /**
    * Handle select vehicle actions
+   * If item has no id open error modal with message
+   * If is valid id set selection
+   * @param {Number} vehicleId Vehicle's id to select
    */
   const handleSelectVehicle = useCallback((vehicleId?: number): void => {
     if (!vehicleId) {
@@ -47,9 +49,13 @@ const App: React.FC = () => {
       return
     }
     setSelected(vehicleId)
-    // setFormModalOpen(true)
   }, [])
 
+  /**
+   * handle close set maintenance form modal
+   * set selection to null
+   * fetch vehicles data
+   */
   const handleCloseSetMaintenance = useCallback(() => {
     setSelected(null)
     fetchVehicles()

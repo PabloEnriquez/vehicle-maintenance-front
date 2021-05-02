@@ -4,6 +4,7 @@ import defaultCar from '../../assets/default-car.png'
 import './Vehicle.css'
 
 type VehicleComponent = VehicleType & {
+  /** Execute selection of vehicle card */
   handleClick: (vehicleId?: number) => void
 }
 
@@ -24,6 +25,8 @@ const [imgError, setImgError] = useState(false)
 
   /**
    * handle selected car
+   * If is valid id execute method
+   * If not valid return
    */
   const handleSelected = useCallback((): void => {
     handleClick(id)
@@ -32,11 +35,18 @@ const [imgError, setImgError] = useState(false)
     }
   }, [handleClick, id])
 
+  /**
+   * Set default img src and imgError flag to true
+   */
   const onImgError = useCallback(() => {
     setImgSrc(defaultCar)
     setImgError(true)
   }, [])
 
+  /**
+   * Set img src from Vehicle image prop
+   * As did mount
+   */
   useEffect(() => {
     setImgSrc(image)
   }, [image])
